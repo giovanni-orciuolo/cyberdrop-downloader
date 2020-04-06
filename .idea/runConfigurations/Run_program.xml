@@ -3,6 +3,7 @@
     <module name="go-cyberdrop" />
     <working_directory value="$PROJECT_DIR$/" />
     <go_parameters value="-i" />
+    <parameters value="-m albums.txt" />
     <kind value="FILE" />
     <filePath value="$PROJECT_DIR$/main.go" />
     <package value="go-cyberdrop" />
