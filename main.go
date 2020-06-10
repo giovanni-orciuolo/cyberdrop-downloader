@@ -112,6 +112,10 @@ func crawlAlbumImages(url string, chTitle chan string, chImages chan string, chD
 					continue
 				}
 
+				// Replace the normal Cyberdrop link with a special one that loads faster!
+				// Thanks @antiops for the tip
+				href = strings.Replace(href, "https://f.cyberdrop.cc/", "https://f.cyberdrop.cc/s/", 1)
+
 				chImages <- href
 				break
 			case "h1":
@@ -211,12 +215,18 @@ func main() {
 		file, err := os.Open(albumsFile)
 		if err != nil {
 			log.Fatal(err)
+			return
 		}
 
 		var albums []string
 		scanner := bufio.NewScanner(file)
 		for scanner.Scan() {
 			albums = append(albums, scanner.Text())
+		}
+
+		if len(albums) == 0 {
+			log.Fatal("There are no albums to download!")
+			return
 		}
 
 		segments := int64(math.Ceil(float64(len(albums) / *batchSize)))

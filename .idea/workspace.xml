@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="20a0919d-0c84-463b-9641-6beeedf8a829" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    <list default="true" id="20a0919d-0c84-463b-9641-6beeedf8a829" name="Default Changelist" comment="Impr">
+      <change beforePath="$PROJECT_DIR$/.idea/runConfigurations/Run_program.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/runConfigurations/Run_program.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
     </list>
@@ -68,7 +68,14 @@
       <option name="project" value="LOCAL" />
       <updated>1586135589721</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Added retry on fail download for images&#10;Added segmentation of albums batch download with customizable batchSize flag&#10;Changed some logs">
+      <created>1586212466947</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1586212466947</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -79,7 +86,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Implemented multiple albums download with wait groups" />
-    <option name="LAST_COMMIT_MESSAGE" value="Implemented multiple albums download with wait groups" />
+    <MESSAGE value="Added retry on fail download for images&#10;Added segmentation of albums batch download with customizable batchSize flag&#10;Changed some logs" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added retry on fail download for images&#10;Added segmentation of albums batch download with customizable batchSize flag&#10;Changed some logs" />
   </component>
   <component name="WindowStateProjectService">
     <state x="552" y="178" key="#Inspections" timestamp="1586111968710">
@@ -90,38 +98,38 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="674" y="156" key="#Run_program/-1920.175.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1586110808061" />
-    <state x="414" y="175" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1586210078463">
+    <state x="414" y="175" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1591831102077">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="414" y="175" key="#com.intellij.execution.impl.EditConfigurationsDialog/-1920.175.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1586210078463" />
-    <state x="583" y="26" key="CommitChangelistDialog2" timestamp="1586135586191">
+    <state x="414" y="175" key="#com.intellij.execution.impl.EditConfigurationsDialog/-1920.175.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591831102077" />
+    <state x="583" y="5" key="CommitChangelistDialog2" timestamp="1591831094883">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="583" y="26" key="CommitChangelistDialog2/-1920.175.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1586135586191" />
+    <state x="583" y="5" key="CommitChangelistDialog2/-1920.175.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591831094883" />
     <state width="430" height="635" key="DebuggerActiveHint" timestamp="1586133381595">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="430" height="635" key="DebuggerActiveHint/-1920.175.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1586133381595" />
-    <state x="740" y="261" key="FileChooserDialogImpl" timestamp="1586110575604">
+    <state x="740" y="261" key="FileChooserDialogImpl" timestamp="1588427091206">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="740" y="261" key="FileChooserDialogImpl/-1920.175.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1586110575604" />
-    <state width="1877" height="284" key="GridCell.Tab.0.bottom" timestamp="1586212229443">
+    <state x="740" y="261" key="FileChooserDialogImpl/-1920.175.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1588427091206" />
+    <state width="1877" height="284" key="GridCell.Tab.0.bottom" timestamp="1591831063933">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="284" key="GridCell.Tab.0.bottom/-1920.175.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1586212229443" />
-    <state width="1877" height="284" key="GridCell.Tab.0.center" timestamp="1586212229442">
+    <state width="1877" height="284" key="GridCell.Tab.0.bottom/-1920.175.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591831063933" />
+    <state width="1877" height="284" key="GridCell.Tab.0.center" timestamp="1591831063933">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="284" key="GridCell.Tab.0.center/-1920.175.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1586212229442" />
-    <state width="1877" height="284" key="GridCell.Tab.0.left" timestamp="1586212229441">
+    <state width="1877" height="284" key="GridCell.Tab.0.center/-1920.175.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591831063933" />
+    <state width="1877" height="284" key="GridCell.Tab.0.left" timestamp="1591831063933">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="284" key="GridCell.Tab.0.left/-1920.175.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1586212229441" />
-    <state width="1877" height="284" key="GridCell.Tab.0.right" timestamp="1586212229443">
+    <state width="1877" height="284" key="GridCell.Tab.0.left/-1920.175.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591831063933" />
+    <state width="1877" height="284" key="GridCell.Tab.0.right" timestamp="1591831063933">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="284" key="GridCell.Tab.0.right/-1920.175.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1586212229443" />
+    <state width="1877" height="284" key="GridCell.Tab.0.right/-1920.175.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591831063933" />
     <state width="1877" height="326" key="GridCell.Tab.1.bottom" timestamp="1586135624511">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -142,10 +150,10 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="712" y="200" key="SettingsEditor/-1920.175.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1586111633534" />
-    <state x="906" y="243" key="Vcs.Push.Dialog.v2" timestamp="1586135593036">
+    <state x="906" y="243" key="Vcs.Push.Dialog.v2" timestamp="1586212472460">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="906" y="243" key="Vcs.Push.Dialog.v2/-1920.175.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1586135593036" />
+    <state x="906" y="243" key="Vcs.Push.Dialog.v2/-1920.175.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1586212472460" />
     <state x="647" y="94" width="626" height="852" key="find.popup" timestamp="1586131067607">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
