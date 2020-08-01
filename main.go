@@ -5,6 +5,10 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
+	"github.com/vbauerster/mpb"
+	"github.com/vbauerster/mpb/decor"
+	"golang.org/x/net/html"
+	"gopkg.in/matryer/try.v1"
 	"io"
 	"log"
 	"net/http"
@@ -13,57 +17,72 @@ import (
 	"strconv"
 	"strings"
 	"sync"
-
-	// Advanced Go features
-	"golang.org/x/net/html"
-
-	// External packages
-	"gopkg.in/matryer/try.v1"
+	"time"
 )
 
-func imageNameFromUrl(imageUrl string) string {
+func addProgressBar(p *mpb.Progress, title string, total int) *mpb.Bar {
+	return p.AddBar(
+		int64(total),
+		mpb.PrependDecorators(
+			decor.Name(title+":", decor.WC{W: len(title) + 1, C: decor.DidentRight}),
+			decor.OnComplete(decor.Name("downloading", decor.WCSyncSpaceR), "done!"),
+			decor.OnComplete(decor.CountersNoUnit("%d / %d", decor.WCSyncWidth), ""),
+		),
+		mpb.AppendDecorators(
+			decor.OnComplete(decor.Percentage(decor.WC{W: 5}), ""),
+		),
+	)
+}
+
+func imageNameFromUrl(imageUrl string) (string, error) {
 	fileUrl, err := url.Parse(imageUrl)
 	if err != nil {
-		fmt.Printf("ERR - Failed to parse url to get image name from url %s. Error: %v\n", imageUrl, err)
-		return ""
+		// fmt.Printf("ERR - Failed to parse url to get image name from url %s. Error: %v\n", imageUrl, err)
+		return "", err
 	}
 
 	segments := strings.Split(fileUrl.Path, "/")
-	return segments[len(segments)-1]
+	return segments[len(segments)-1], nil
 }
 
-func downloadImage(directory string, url string, chDone chan bool) {
-	defer func() { chDone <- true }()
+func downloadImage(directory string, url string, b *mpb.Bar) {
+	defer func() {
+		b.Increment()
+	}()
 
 	err := try.Do(func(attempt int) (bool, error) {
-		if attempt > 1 {
-			fmt.Printf("INFO - Attempt #%d on image %s!\n", attempt, url)
-		}
+		//if attempt > 1 {
+		//	fmt.Printf("INFO - Attempt #%d on image %s!\n", attempt, url)
+		//}
 
 		resp, err := http.Get(url)
 		if err != nil {
-			fmt.Printf("ERR - Failed to get page from image url %s. Error is %v. Retrying...\n", url, err)
+			// fmt.Printf("ERR - Failed to get page from image url %s. Error is %v. Retrying...\n", url, err)
+			return true, err
+		}
+		defer resp.Body.Close()
+
+		imageName, err := imageNameFromUrl(url)
+		if err != nil {
 			return true, err
 		}
 
-		defer resp.Body.Close()
-
-		file, err := os.Create(directory + "/" + imageNameFromUrl(url))
+		file, err := os.Create(directory + "/" + imageName)
 		if err != nil {
-			fmt.Printf("ERR - Failed to create image file from image url %s. Error is %v. Retrying...\n", url, err)
+			// fmt.Printf("ERR - Failed to create image file from image url %s. Error is %v. Retrying...\n", url, err)
 			return true, err
 		}
 		defer file.Close()
 
 		written, err := io.Copy(file, resp.Body)
 		if err != nil {
-			fmt.Printf("ERR - Failed to save image from url %s to file. Error is %v. Retrying...\n", url, err)
+			// fmt.Printf("ERR - Failed to save image from url %s to file. Error is %v. Retrying...\n", url, err)
 			return true, err
 		}
 
 		downloadedBytes, _ := strconv.ParseInt(resp.Header.Get("Content-Length"), 10, 64)
 		if written != downloadedBytes {
-			fmt.Printf("ERR - Content length mismatch between written bytes and downloaded bytes! Retrying...\n")
+			// fmt.Printf("ERR - Content length mismatch between written bytes and downloaded bytes! Retrying...\n")
 			return true, err
 		}
 
@@ -71,7 +90,8 @@ func downloadImage(directory string, url string, chDone chan bool) {
 	})
 
 	if err != nil {
-		fmt.Printf("INFO - Gave up downloading image %s after %d retries. Fuck that image in particular.\n", url, try.MaxRetries)
+		// fmt.Printf("INFO - Gave up downloading image %s after %d retries. Fuck that image in particular.\n", url, try.MaxRetries)
+		b.Abort(false)
 	}
 }
 
@@ -106,8 +126,10 @@ func crawlAlbumImages(url string, chTitle chan string, chImages chan string, chD
 			t := z.Token()
 			switch t.Data {
 			case "a":
-				class, present := getTokenAttrValue(t, "class")
-				if !present || class != "image" {
+				// Automatically gets the best URL from the other anchor
+				// Thanks @antiops for the tip!
+				id, present := getTokenAttrValue(t, "id")
+				if !present || id != "file" {
 					continue
 				}
 
@@ -115,10 +137,6 @@ func crawlAlbumImages(url string, chTitle chan string, chImages chan string, chD
 				if !present || !strings.Contains(href, "http") {
 					continue
 				}
-
-				// Replace the normal Cyberdrop link with a special one that loads faster!
-				// Thanks @antiops for the tip
-				href = strings.Replace(href, "https://f.cyberdrop.cc/", "https://f.cyberdrop.cc/s/", 1)
 
 				chImages <- href
 				break
@@ -136,7 +154,7 @@ func crawlAlbumImages(url string, chTitle chan string, chImages chan string, chD
 	}
 }
 
-func downloadAlbum(url string, wg *sync.WaitGroup) {
+func downloadAlbum(url string, wg *sync.WaitGroup, p *mpb.Progress) {
 	defer wg.Done()
 
 	chTitle := make(chan string)
@@ -159,38 +177,42 @@ crawl:
 		}
 	}
 
-	fmt.Printf("Fetched album '%s'! Downloading it...\n", title)
-	directory := title
+	// fmt.Printf("Fetched album '%s'! Downloading it...\n", title)
+	b := addProgressBar(p, title, len(images))
 
+	directory := title
 	if _, err := os.Stat(directory); os.IsNotExist(err) {
 		err = os.Mkdir(directory, 0755)
 		if err != nil {
-			fmt.Printf("ERR - Failed to create directory %s/. Error: %v\n", directory, err)
+			b.Abort(false)
+			// fmt.Printf("ERR - Failed to create directory %s/. Error: %v\n", directory, err)
 			return
 		}
 	}
 
-	chDoneDownload := make(chan bool)
 	for _, image := range images {
-		go downloadImage(directory, image, chDoneDownload)
+		go downloadImage(directory, image, b)
 	}
 
-	for c := range images {
-		select {
-		case <-chDoneDownload:
-			c++
-		}
+	for !b.Completed() {
+		// Wait for bar completion
 	}
 
-	fmt.Printf("INFO - Downloaded the entire '%s' album! (%d images)\n", title, len(images))
+	// fmt.Printf("INFO - Downloaded the entire '%s' album! (%d images)\n", title, len(images))
 }
 
 func downloadAlbums(urls []string) {
 	var wg sync.WaitGroup
+	wg.Add(len(urls))
+
+	p := mpb.New(
+		mpb.WithWaitGroup(&wg),
+		mpb.WithWidth(60),
+		mpb.WithRefreshRate(180*time.Millisecond),
+	)
 
 	for _, album := range urls {
-		wg.Add(1)
-		go downloadAlbum(album, &wg)
+		go downloadAlbum(album, &wg, p)
 	}
 
 	wg.Wait()
@@ -208,7 +230,14 @@ func main() {
 
 		var wg sync.WaitGroup
 		wg.Add(1)
-		go downloadAlbum(albumUrl, &wg)
+
+		p := mpb.New(
+			mpb.WithWaitGroup(&wg),
+			mpb.WithWidth(60),
+			mpb.WithRefreshRate(180*time.Millisecond),
+		)
+
+		go downloadAlbum(albumUrl, &wg, p)
 
 		wg.Wait()
 	}
@@ -244,6 +273,7 @@ func main() {
 			} else {
 				queue = albums
 			}
+
 			downloadAlbums(queue)
 			idx += *batchSize
 		}
