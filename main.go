@@ -1,20 +1,24 @@
 package main
 
 import (
+	// Built-in Go features
 	"bufio"
 	"flag"
 	"fmt"
-	"golang.org/x/net/html"
-	"gopkg.in/matryer/try.v1"
 	"io"
 	"log"
-	"math"
 	"net/http"
 	"net/url"
 	"os"
 	"strconv"
 	"strings"
 	"sync"
+
+	// Advanced Go features
+	"golang.org/x/net/html"
+
+	// External packages
+	"gopkg.in/matryer/try.v1"
 )
 
 func imageNameFromUrl(imageUrl string) string {
@@ -195,7 +199,7 @@ func downloadAlbums(urls []string) {
 func main() {
 	multiple := flag.Bool("m", false,
 		"True if you want to download multiple albums by passing a text file containing album links as input.")
-	batchSize := flag.Int("batchSize", 5,
+	batchSize := flag.Int("b", 5,
 		"Number of concurrent allowed album downloads (default is 5).")
 	flag.Parse()
 
@@ -229,12 +233,17 @@ func main() {
 			return
 		}
 
-		segments := int64(math.Ceil(float64(len(albums) / *batchSize)))
+		fmt.Printf("Ready to download %d albums!\n", len(albums))
 		idx := 0
-		fmt.Printf("Ready to download %d albums! I will divide them into %d segments so I don't hit rate limit on Cyberdrop. Go!\n", len(albums), segments)
 
 		for idx < len(albums) {
-			queue := albums[idx:(idx + *batchSize)]
+			// Fuck Go doesn't have ternary expressions!!!
+			var queue []string
+			if *batchSize < len(albums) {
+				queue = albums[idx:(idx + *batchSize)]
+			} else {
+				queue = albums
+			}
 			downloadAlbums(queue)
 			idx += *batchSize
 		}
